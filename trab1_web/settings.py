@@ -23,6 +23,7 @@ class AppSettings(BaseSettings):
     # Validation: Automatically looks for SECRET_KEY in environment
     SECRET_KEY: SecretStr = Field(...)
     DEBUG: bool = False
+    ALLOWED_HOSTS: list[str] = Field(...)
 
     model_config = SettingsConfigDict(env_file=".env")
 
@@ -40,7 +41,7 @@ SECRET_KEY = config.SECRET_KEY.get_secret_value()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config.DEBUG
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config.ALLOWED_HOSTS
 
 
 # Application definition
