@@ -5,10 +5,10 @@ services:
     runtime: python
     repo: https://github.com/luizfneves404/trab1-web.git
     buildCommand: "uv sync"
-    startCommand: "python -m gunicorn trab1_web.asgi:application -k
+    startCommand: "uv run gunicorn trab1_web.asgi:application -k
       uvicorn.workers.UvicornWorker"
     envVars:
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
-        value: "[trab1-web.onrender.com]"
+        value: "[\"trab1-web.onrender.com\"]"
