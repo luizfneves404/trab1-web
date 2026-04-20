@@ -1,18 +1,12 @@
 services:
   - type: web
     plan: free
-    name: django-app
+    name: trab1-web
     runtime: python
-    repo: https://github.com/render-examples/django.git
-    buildCommand: "./build.sh"
-    startCommand: "python -m gunicorn mysite.asgi:application -k
+    repo: https://github.com/luizfneves404/trab1-web.git
+    buildCommand: "uv sync"
+    startCommand: "python -m gunicorn trab1_web.asgi:application -k
       uvicorn.workers.UvicornWorker"
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: django-app-db
-          property: connectionString
-
-databases:
-  - name: django-app-db
-    plan: free
+      - key: SECRET_KEY
+        generateValue: true
