@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 
+import dj_database_url
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -24,6 +25,7 @@ class AppSettings(BaseSettings):
     SECRET_KEY: SecretStr = Field(...)
     DEBUG: bool = False
     ALLOWED_HOSTS: list[str] = Field(...)
+    DATABASE_URL: SecretStr | None = Field(...)
 
     model_config = SettingsConfigDict(env_file=".env")
 
@@ -88,12 +90,24 @@ WSGI_APPLICATION = "trab1_web.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+_database_url = (
+    config.DATABASE_URL.get_secret_value().strip() if config.DATABASE_URL else ""
+)
+if _database_url:
+    DATABASES = {
+        "default": dj_database_url.parse(
+            _database_url,
+            conn_max_age=0,
+            ssl_require=True,
+        )
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
