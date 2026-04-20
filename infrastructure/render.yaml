@@ -11,4 +11,4 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
-        value: "[\"trab1-web.onrender.com\"]"
+        sync: false
