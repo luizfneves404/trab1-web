@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>{{ task_list.name }}</h1>
+  <p>{{ task_list.description }}</p>
+  <ul>
+    {% for task in tasks %}
+      <li>{{ task.title }} {% if task.done %}(concluída){% endif %}</li>
+    {% empty %}
+      <li>Sem tarefas</li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'tasks:list_update' task_list.pk %}">Editar</a>
+  <a href="{% url 'tasks:list_delete' task_list.pk %}">Excluir</a>
+{% endblock %}
