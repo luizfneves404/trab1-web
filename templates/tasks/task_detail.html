@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+  <p><a href="{% url 'tasks:list_detail' task.task_list.pk %}">Voltar para {{ task.task_list.name }}</a></p>
+  <h1>{{ task.title }}</h1>
+  <p>Status: {{ task.get_status_display }} · Prioridade: {{ task.get_priority_display }}</p>
+  {% if task.description %}
+    <p>{{ task.description }}</p>
+  {% endif %}
+  <ul>
+    <li>Lista: {{ task.task_list.name }}</li>
+    {% if task.planned_date %}<li>Planejada para: {{ task.planned_date }}</li>{% endif %}
+    {% if task.due_date %}<li>Prazo: {{ task.due_date }}</li>{% endif %}
+    <li>Criada em: {{ task.created_at }}</li>
+    <li>Atualizada em: {{ task.updated_at }}</li>
+  </ul>
+  <p>
+    <a href="{% url 'tasks:task_update' list_pk=task.task_list.pk pk=task.pk %}">Editar</a>
+    ·
+    <a href="{% url 'tasks:task_delete' list_pk=task.task_list.pk pk=task.pk %}">Excluir</a>
+  </p>
+  {% if task.status != 'done' %}
+    <form action="{% url 'tasks:task_mark_done' list_pk=task.task_list.pk pk=task.pk %}" method="post">
+      {% csrf_token %}
+      <button type="submit">Marcar como concluída</button>
+    </form>
+  {% else %}
+    <p><strong>Concluída</strong></p>
+  {% endif %}
+{% endblock %}

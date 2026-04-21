@@ -1,14 +1,48 @@
 {% extends "base.html" %}
 {% block content %}
+  <p><a href="{% url 'tasks:list_list' %}">Voltar para listas</a></p>
   <h1>{{ task_list.name }}</h1>
-  <p>{{ task_list.description }}</p>
-  <ul>
+  {% if task_list.description %}
+    <p>{{ task_list.description }}</p>
+  {% endif %}
+  <p>
+    <a href="{% url 'tasks:task_create' list_pk=task_list.pk %}">Nova tarefa</a>
+    ·
+    <a href="{% url 'tasks:list_update' task_list.pk %}">Editar lista</a>
+    ·
+    <a href="{% url 'tasks:list_delete' task_list.pk %}">Excluir lista</a>
+  </p>
+
+  <h2>Tarefas</h2>
+  <p>{{ task_count }} tarefa{{ task_count|pluralize }}</p>
+  <div style="display:grid; gap:12px;">
     {% for task in tasks %}
-      <li>{{ task.title }} {% if task.done %}(concluída){% endif %}</li>
+      <article style="border:1px solid #ccc; border-left:6px solid {% if task.priority == 'high' %}#c00{% elif task.priority == 'medium' %}#e67e22{% else %}#2a7{% endif %}; padding:12px; border-radius:6px;">
+        <h3 style="margin-top:0;"><a href="{% url 'tasks:task_detail' list_pk=task_list.pk pk=task.pk %}">{{ task.title }}</a></h3>
+        <p>Status: {{ task.get_status_display }} · Prioridade: {{ task.get_priority_display }}</p>
+        {% if task.description %}
+          <p>{{ task.description }}</p>
+        {% endif %}
+        <p>
+          {% if task.planned_date %}Planejada: {{ task.planned_date }}{% endif %}
+          {% if task.due_date %}{% if task.planned_date %} · {% endif %}Prazo: {{ task.due_date }}{% endif %}
+        </p>
+        <p>
+          <a href="{% url 'tasks:task_update' list_pk=task_list.pk pk=task.pk %}">Editar</a>
+          ·
+          <a href="{% url 'tasks:task_delete' list_pk=task_list.pk pk=task.pk %}">Excluir</a>
+        </p>
+        {% if task.status != 'done' %}
+          <form action="{% url 'tasks:task_mark_done' list_pk=task_list.pk pk=task.pk %}" method="post" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit">Marcar como concluída</button>
+          </form>
+        {% else %}
+          <p style="margin:0;"><strong>Concluída</strong></p>
+        {% endif %}
+      </article>
     {% empty %}
-      <li>Sem tarefas</li>
+      <p>Sem tarefas nesta lista. <a href="{% url 'tasks:task_create' list_pk=task_list.pk %}">Criar a primeira</a>.</p>
     {% endfor %}
-  </ul>
-  <a href="{% url 'tasks:list_update' task_list.pk %}">Editar</a>
-  <a href="{% url 'tasks:list_delete' task_list.pk %}">Excluir</a>
+  </div>
 {% endblock %}
