@@ -55,8 +55,5 @@ class TaskListDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        # Envia as tarefas da lista para o template.
-        ctx["tasks"] = (
-            self.object.tasks.all()
-        )  # Funciona por conta de related_name='tasks' na ForeignKey de Task para TaskList.
+        ctx["tasks"] = self.object.tasks.all()
         return ctx

@@ -16,3 +16,15 @@ class TaskList(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Task(models.Model):
+    objects: ClassVar[models.Manager["Task"]] = models.Manager()
+    task_list = models.ForeignKey(
+        TaskList, on_delete=models.CASCADE, related_name="tasks"
+    )
+    title = models.CharField(max_length=255)
+    done = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return str(self.title)

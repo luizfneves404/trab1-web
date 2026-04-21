@@ -140,9 +140,13 @@ Encerra sessão atual.
 
 Solicita redefinição de senha por e-mail.
 
+**Implementação:** não há rotas nem templates de reset neste repositório. O Django oferece `PasswordResetView`, `PasswordResetDoneView`, `PasswordResetConfirmView` e `PasswordResetCompleteView` em `django.contrib.auth.views`, com templates em `registration/` e envio via `EMAIL_*` / `DEFAULT_FROM_EMAIL` em `settings.py`. Guia: [Using the authentication views](https://docs.djangoproject.com/en/stable/topics/auth/default/#using-the-views).
+
 ## password_reset_confirm_view
 
 Permite cadastrar nova senha.
+
+**Implementação:** ver nota em `password_reset_view` acima.
 
 ---
 

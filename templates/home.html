@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}
+  Painel — Trab1 Web
+{% endblock %}
+{% block content %}
+  <h1>Painel</h1>
+  <p>Olá, {{ user.username }}. O dashboard completo virá em breve.</p>
+  <p><a href="{% url 'tasks:list_create' %}">Criar nova lista de tarefas</a></p>
+{% endblock %}

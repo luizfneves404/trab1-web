@@ -7,10 +7,15 @@ Install uv, if you don't have it already.
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Install the dependencies:
+Install the dependencies with uv:
 
 ```bash
 uv sync
+```
+
+or, if you don't like uv:
+```bash
+pip install .
 ```
 
 Apply the migrations:
