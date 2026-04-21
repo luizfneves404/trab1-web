@@ -1,10 +1,15 @@
-from django.db import models
+from typing import ClassVar
+
 from django.contrib.auth.models import User
+from django.db import models
 
 
 class TaskList(models.Model):
+    objects: ClassVar[models.Manager["TaskList"]] = models.Manager()
     name = models.CharField(max_length=255)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_lists') # related_name funciona como um nome de atributo para acessar as listas de tarefas pelo usuário
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="task_lists"
+    )  # related_name funciona como um nome de atributo para acessar as listas de tarefas pelo usuário
     description = models.TextField(blank=True, null=True)
     color = models.CharField(max_length=7, default="#FFFFFF")  # Default = Branco
     created_at = models.DateTimeField(auto_now_add=True)

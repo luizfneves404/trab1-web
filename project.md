@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-Sistema web de gerenciamento de tarefas com autenticação por usuário.  
+Sistema web de gerenciamento de tarefas com autenticação por usuário.
 Cada usuário terá acesso apenas aos próprios dados, podendo criar listas, tarefas e subtarefas.
 
 ---

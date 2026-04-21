@@ -76,7 +76,7 @@ data "oci_core_images" "ubuntu" {
   shape                    = "VM.Standard.A1.Flex"
   sort_by                  = "TIMECREATED"
   sort_order               = "DESC"
-  
+
   # Ensure we get the ARM image specifically
   filter {
     name   = "display_name"
@@ -90,10 +90,10 @@ resource "oci_core_instance" "dokploy_server" {
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
   compartment_id      = var.compartment_ocid
   display_name        = "dokploy-server-free"
-  
+
   # Always Free ARM shape
-  shape               = "VM.Standard.A1.Flex" 
-  
+  shape               = "VM.Standard.A1.Flex"
+
   # Half of the Always Free tier limits
   shape_config {
     ocpus         = 1
