@@ -1,5 +1,5 @@
 from django import forms
-from .models import Task, TaskList
+from .models import SubTask, Task, TaskList
 
 
 class TaskListForm(forms.ModelForm):
@@ -31,3 +31,9 @@ class TaskForm(forms.ModelForm):
             self.fields["task_list"].queryset = TaskList.objects.filter(
                 user=user
             ).order_by("name")
+
+
+class SubTaskForm(forms.ModelForm):
+    class Meta:
+        model = SubTask
+        fields = ["title"]

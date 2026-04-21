@@ -1,7 +1,7 @@
 services:
   - type: web
     plan: free
-    name: trab1-web
+    name: Taskmaster
     runtime: python
     repo: https://github.com/luizfneves404/trab1-web.git
     buildCommand: "uv sync"

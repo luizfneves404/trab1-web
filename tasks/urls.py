@@ -1,5 +1,8 @@
 from django.urls import path
 from .views import (
+    SubTaskCreateView,
+    SubTaskDeleteView,
+    SubTaskToggleView,
     TaskCreateView,
     TaskDeleteView,
     TaskDetailView,
@@ -47,5 +50,20 @@ urlpatterns = [
         "lists/<int:list_pk>/tasks/<int:pk>/done/",
         TaskMarkDoneView.as_view(),
         name="task_mark_done",
+    ),
+    path(
+        "lists/<int:list_pk>/tasks/<int:pk>/subtasks/new/",
+        SubTaskCreateView.as_view(),
+        name="subtask_create",
+    ),
+    path(
+        "lists/<int:list_pk>/tasks/<int:pk>/subtasks/<int:subtask_pk>/toggle/",
+        SubTaskToggleView.as_view(),
+        name="subtask_toggle",
+    ),
+    path(
+        "lists/<int:list_pk>/tasks/<int:pk>/subtasks/<int:subtask_pk>/delete/",
+        SubTaskDeleteView.as_view(),
+        name="subtask_delete",
     ),
 ]

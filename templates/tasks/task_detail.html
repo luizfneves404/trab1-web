@@ -29,4 +29,33 @@
   {% else %}
     <p><strong>Concluída</strong></p>
   {% endif %}
+
+  <h2>Subtarefas</h2>
+  <form action="{% url 'tasks:subtask_create' list_pk=task.task_list.pk pk=task.pk %}" method="post">
+    {% csrf_token %}
+    {{ subtask_form.as_p }}
+    <button type="submit">Adicionar subtarefa</button>
+  </form>
+
+  <ul>
+    {% for subtask in subtasks %}
+      <li>
+        <form action="{% url 'tasks:subtask_toggle' list_pk=task.task_list.pk pk=task.pk subtask_pk=subtask.pk %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit">{% if subtask.done %}Desmarcar{% else %}Concluir{% endif %}</button>
+        </form>
+        {% if subtask.done %}
+          <s>{{ subtask.title }}</s>
+        {% else %}
+          {{ subtask.title }}
+        {% endif %}
+        <form action="{% url 'tasks:subtask_delete' list_pk=task.task_list.pk pk=task.pk subtask_pk=subtask.pk %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit">Excluir</button>
+        </form>
+      </li>
+    {% empty %}
+      <li>Sem subtarefas</li>
+    {% endfor %}
+  </ul>
 {% endblock %}

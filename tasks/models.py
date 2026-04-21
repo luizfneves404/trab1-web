@@ -53,3 +53,14 @@ class Task(models.Model):
 
     def __str__(self) -> str:
         return str(self.title)
+
+
+class SubTask(models.Model):
+    objects: ClassVar[models.Manager["SubTask"]] = models.Manager()
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="subtasks")
+    title = models.CharField(max_length=255)
+    done = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return str(self.title)

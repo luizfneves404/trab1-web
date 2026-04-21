@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Task, TaskList
+from .models import SubTask, Task, TaskList
 
 
 class TaskListDetailViewTests(TestCase):
@@ -124,3 +124,135 @@ class TaskCrudViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
+
+
+class SubTaskViewTests(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            "owner", "owner@example.com", "sE7!kM2@nP9#xQ1"
+        )
+        self.other_user = User.objects.create_user(
+            "other", "other@example.com", "sE7!kM2@nP9#xQ1"
+        )
+        self.task_list = TaskList.objects.create(user=self.user, name="Compras")
+        self.task = Task.objects.create(
+            owner=self.user,
+            task_list=self.task_list,
+            title="Mercado",
+        )
+        self.other_list = TaskList.objects.create(user=self.other_user, name="Trabalho")
+        self.other_task = Task.objects.create(
+            owner=self.other_user,
+            task_list=self.other_list,
+            title="Privada",
+        )
+
+    def test_owner_can_open_task_detail_with_subtasks(self) -> None:
+        SubTask.objects.create(task=self.task, title="Comprar leite")
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse(
+                "tasks:task_detail",
+                kwargs={"list_pk": self.task_list.pk, "pk": self.task.pk},
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Subtarefas")
+        self.assertContains(response, "Comprar leite")
+
+    def test_owner_can_create_subtask(self) -> None:
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse(
+                "tasks:subtask_create",
+                kwargs={"list_pk": self.task_list.pk, "pk": self.task.pk},
+            ),
+            {"title": "Comprar pão"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            SubTask.objects.filter(task=self.task, title="Comprar pão").exists()
+        )
+
+    def test_owner_can_toggle_subtask(self) -> None:
+        subtask = SubTask.objects.create(task=self.task, title="Comprar leite")
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse(
+                "tasks:subtask_toggle",
+                kwargs={
+                    "list_pk": self.task_list.pk,
+                    "pk": self.task.pk,
+                    "subtask_pk": subtask.pk,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 302)
+        subtask.refresh_from_db()
+        self.assertTrue(subtask.done)
+
+    def test_owner_can_delete_subtask(self) -> None:
+        subtask = SubTask.objects.create(task=self.task, title="Comprar leite")
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse(
+                "tasks:subtask_delete",
+                kwargs={
+                    "list_pk": self.task_list.pk,
+                    "pk": self.task.pk,
+                    "subtask_pk": subtask.pk,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(SubTask.objects.filter(pk=subtask.pk).exists())
+
+    def test_user_cannot_create_subtask_for_other_users_task(self) -> None:
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse(
+                "tasks:subtask_create",
+                kwargs={"list_pk": self.other_list.pk, "pk": self.other_task.pk},
+            ),
+            {"title": "Invadir"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(
+            SubTask.objects.filter(task=self.other_task, title="Invadir").exists()
+        )
+
+    def test_user_cannot_toggle_other_users_subtask(self) -> None:
+        subtask = SubTask.objects.create(task=self.other_task, title="Privada")
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse(
+                "tasks:subtask_toggle",
+                kwargs={
+                    "list_pk": self.other_list.pk,
+                    "pk": self.other_task.pk,
+                    "subtask_pk": subtask.pk,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+        subtask.refresh_from_db()
+        self.assertFalse(subtask.done)
+
+    def test_deleting_task_deletes_subtasks(self) -> None:
+        SubTask.objects.create(task=self.task, title="Comprar leite")
+
+        self.task.delete()
+
+        self.assertFalse(SubTask.objects.exists())

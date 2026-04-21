@@ -14,8 +14,8 @@ from django.views.generic import (
     ListView,
 )
 
-from .forms import TaskForm, TaskListForm
-from .models import Task, TaskList
+from .forms import SubTaskForm, TaskForm, TaskListForm
+from .models import SubTask, Task, TaskList
 
 
 class TaskListCreateView(LoginRequiredMixin, CreateView):
@@ -167,6 +167,12 @@ class TaskDetailView(TaskDetailQuerysetMixin, DetailView):
     template_name = "tasks/task_detail.html"
     context_object_name = "task"
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["subtasks"] = self.object.subtasks.order_by("done", "created_at", "title")
+        ctx["subtask_form"] = SubTaskForm()
+        return ctx
+
 
 class TaskUpdateView(TaskDetailQuerysetMixin, UpdateView):
     model = Task
@@ -215,3 +221,53 @@ class TaskMarkDoneView(TaskDetailQuerysetMixin, SingleObjectMixin, View):
             list_pk=task.task_list_id,
             pk=task.pk,
         )
+
+
+class SubTaskCreateView(TaskDetailQuerysetMixin, SingleObjectMixin, View):
+    def post(self, request, *args, **kwargs):
+        task = self.get_object()
+        form = SubTaskForm(request.POST)
+        if form.is_valid():
+            subtask = form.save(commit=False)
+            subtask.task = task
+            subtask.save()
+
+        return redirect(
+            "tasks:task_detail",
+            list_pk=task.task_list_id,
+            pk=task.pk,
+        )
+
+
+class SubTaskOwnerMixin(LoginRequiredMixin):
+    request: Any
+    kwargs: dict[str, Any]
+
+    def get_subtask(self) -> SubTask:
+        return get_object_or_404(
+            SubTask,
+            pk=self.kwargs["subtask_pk"],
+            task_id=self.kwargs["pk"],
+            task__task_list_id=self.kwargs["list_pk"],
+            task__task_list__user=self.request.user,
+        )
+
+
+class SubTaskToggleView(SubTaskOwnerMixin, View):
+    def post(self, request, *args, **kwargs):
+        subtask = self.get_subtask()
+        SubTask.objects.filter(pk=subtask.pk).update(done=not bool(subtask.done))
+        return redirect(
+            "tasks:task_detail",
+            list_pk=self.kwargs["list_pk"],
+            pk=self.kwargs["pk"],
+        )
+
+
+class SubTaskDeleteView(SubTaskOwnerMixin, View):
+    def post(self, request, *args, **kwargs):
+        subtask = self.get_subtask()
+        list_pk = self.kwargs["list_pk"]
+        task_pk = self.kwargs["pk"]
+        subtask.delete()
+        return redirect("tasks:task_detail", list_pk=list_pk, pk=task_pk)
