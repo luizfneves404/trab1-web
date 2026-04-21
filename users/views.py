@@ -4,8 +4,15 @@ from typing import Any
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Q
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView,
+)
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -83,3 +90,19 @@ login_view = LoginView.as_view(
     redirect_authenticated_user=True,
 )
 logout_view = LogoutView.as_view(next_page=reverse_lazy("users:login"))
+password_reset_view = PasswordResetView.as_view(
+    template_name="registration/password_reset_form.html",
+    email_template_name="registration/password_reset_email.html",
+    subject_template_name="registration/password_reset_subject.txt",
+    success_url=reverse_lazy("users:password_reset_done"),
+)
+password_reset_done_view = PasswordResetDoneView.as_view(
+    template_name="registration/password_reset_done.html",
+)
+password_reset_confirm_view = PasswordResetConfirmView.as_view(
+    template_name="registration/password_reset_confirm.html",
+    success_url=reverse_lazy("users:password_reset_complete"),
+)
+password_reset_complete_view = PasswordResetCompleteView.as_view(
+    template_name="registration/password_reset_complete.html",
+)
