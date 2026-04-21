@@ -34,10 +34,16 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-## Contributing
+## Development
 
 Install the pre-commit hooks:
 
 ```bash
 uv run pre-commit install
+```
+
+Run the tests:
+
+```bash
+uv run manage.py test
 ```
