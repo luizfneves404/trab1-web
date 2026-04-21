@@ -1,18 +1,18 @@
 from typing import Any
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Case, Count, IntegerField, Prefetch, Q, Value, When
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.detail import SingleObjectMixin
 from django.views import View
 from django.views.generic import (
     CreateView,
-    UpdateView,
     DeleteView,
     DetailView,
     ListView,
+    UpdateView,
 )
+from django.views.generic.detail import SingleObjectMixin
 
 from .forms import SubTaskForm, TaskForm, TaskListForm
 from .models import SubTask, Task, TaskList
