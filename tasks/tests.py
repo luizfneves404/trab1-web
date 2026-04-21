@@ -9,7 +9,7 @@ class TaskListDetailViewTests(TestCase):
     def test_owner_can_open_list_detail_with_tasks(self) -> None:
         user = User.objects.create_user("owner", "owner@example.com", "sE7!kM2@nP9#xQ1")
         task_list = TaskList.objects.create(user=user, name="Compras")
-        Task.objects.create(task_list=task_list, title="Leite", done=False)
+        Task.objects.create(task_list=task_list, title="Leite")
         self.client.force_login(user)
 
         response = self.client.get(
