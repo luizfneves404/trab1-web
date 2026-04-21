@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
+from tasks.models import Task, TaskList
+
 
 class AuthFlowTests(TestCase):
     def test_home_redirects_anonymous_to_login(self) -> None:
@@ -34,3 +36,22 @@ class AuthFlowTests(TestCase):
         out = self.client.post(reverse("users:logout"))
         self.assertEqual(out.status_code, 302)
         self.assertIn(reverse("users:login"), out.url)
+
+    def test_home_shows_list_cards_and_quick_actions(self) -> None:
+        user = User.objects.create_user(
+            "carol", "carol@example.com", "zX1!qW2@eR3#tY4$"
+        )
+        task_list = TaskList.objects.create(user=user, name="Faculdade")
+        Task.objects.create(task_list=task_list, owner=user, title="Estudar")
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Minhas Listas")
+        self.assertContains(response, "Faculdade")
+        self.assertContains(response, "1 tarefa pendente")
+        self.assertContains(response, "Nova tarefa")
+        self.assertContains(response, "Nova lista")
+        self.assertContains(response, "Ver atrasadas")
+        self.assertContains(response, "Ver concluídas")

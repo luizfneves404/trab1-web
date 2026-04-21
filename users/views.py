@@ -4,7 +4,7 @@ from typing import Any
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.contrib.auth.views import (
     LoginView,
     LogoutView,
@@ -20,6 +20,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import CreateView, TemplateView
 
 from tasks.models import Task
+from tasks.models import TaskList
 
 from .forms import RegistrationForm
 
@@ -63,6 +64,19 @@ class HomeView(LoginRequiredMixin, TemplateView):
             status=Task.Status.DONE, updated_at__date__gte=week_start
         ).count()
 
+        ctx["task_lists"] = (
+            TaskList.objects.filter(user=user)
+            .annotate(
+                pending_count=Count(
+                    "tasks",
+                    filter=Q(
+                        tasks__status__in=[Task.Status.PENDING, Task.Status.IN_PROGRESS]
+                    ),
+                )
+            )
+            .order_by("name")
+        )
+
         overdue = pending_qs.filter(due_date__lt=today).order_by("due_date")
         near_due = pending_qs.filter(
             due_date__gte=today, due_date__lte=today + datetime.timedelta(days=7)
@@ -79,6 +93,10 @@ class HomeView(LoginRequiredMixin, TemplateView):
                 upcoming.append(task)
 
         ctx["upcoming_tasks"] = upcoming[:10]
+        ctx["overdue_tasks"] = list(overdue[:5])
+        ctx["completed_tasks"] = list(
+            base_qs.filter(status=Task.Status.DONE).order_by("-updated_at", "-pk")[:5]
+        )
         ctx["today"] = today
         return ctx
 

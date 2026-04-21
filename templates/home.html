@@ -46,6 +46,43 @@
   .badge-today   { background: #fff3cd; color: #856404; }
   .badge-soon    { background: #e3f2fd; color: #1565c0; }
   .empty-state { color: #888; font-style: italic; padding: 1rem 0; }
+  .section { margin-bottom: 2.5rem; }
+  .list-grid,
+  .action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+  .list-card,
+  .action-card {
+    display: block;
+    border: 1px solid #d9d9d9;
+    border-radius: 10px;
+    padding: 1rem;
+    text-decoration: none;
+    color: inherit;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+  .list-card:hover,
+  .action-card:hover {
+    border-color: #b9c7e6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .list-card h3,
+  .action-card h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1rem;
+  }
+  .list-card p,
+  .action-card p {
+    margin: 0;
+    color: #666;
+  }
+  .action-primary { border-color: #5b8dee; }
+  .action-accent { border-color: #4caf82; }
+  .action-warn { border-color: #f0a500; }
+  .action-muted { border-color: #9e9e9e; }
 </style>
 
 <div class="dashboard">
@@ -71,6 +108,98 @@
       <div class="card-label">Concluídas na semana</div>
     </div>
   </div>
+
+  <!-- Bloco 3: Minhas Listas -->
+  <section class="section" id="minhas-listas">
+    <h2>Minhas Listas</h2>
+    {% if task_lists %}
+      <div class="list-grid">
+        {% for lst in task_lists %}
+          <a class="list-card" href="{% url 'tasks:list_detail' lst.pk %}">
+            <h3>{{ lst.name }}</h3>
+            <p>{{ lst.pending_count }} tarefa{{ lst.pending_count|pluralize }} pendente{{ lst.pending_count|pluralize }}</p>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="empty-state">Você ainda não tem listas. Crie a primeira para começar.</p>
+    {% endif %}
+  </section>
+
+  <!-- Bloco 4: Ações Rápidas -->
+  <section class="section" id="acoes-rapidas">
+    <h2>Ações Rápidas</h2>
+    <div class="action-grid">
+      <a class="action-card action-primary" href="{% url 'tasks:list_list' %}">
+        <h3>Nova tarefa</h3>
+        <p>Escolha uma lista para criar uma tarefa.</p>
+      </a>
+      <a class="action-card action-accent" href="{% url 'tasks:list_create' %}">
+        <h3>Nova lista</h3>
+        <p>Crie um novo grupo de tarefas.</p>
+      </a>
+      <a class="action-card action-warn" href="#tarefas-atrasadas">
+        <h3>Ver atrasadas</h3>
+        <p>Veja as tarefas com prazo vencido.</p>
+      </a>
+      <a class="action-card action-muted" href="#tarefas-concluidas">
+        <h3>Ver concluídas</h3>
+        <p>Abra o resumo das tarefas finalizadas.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="section" id="tarefas-atrasadas">
+    <h2>Tarefas atrasadas</h2>
+    {% if overdue_tasks %}
+      <table class="task-table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Lista</th>
+            <th>Prazo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in overdue_tasks %}
+            <tr>
+              <td>{{ task.title }}</td>
+              <td>{{ task.task_list.name }}</td>
+              <td>{{ task.due_date|date:"d/m/Y" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty-state">Nenhuma tarefa atrasada no momento.</p>
+    {% endif %}
+  </section>
+
+  <section class="section" id="tarefas-concluidas">
+    <h2>Tarefas concluídas</h2>
+    {% if completed_tasks %}
+      <table class="task-table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Lista</th>
+            <th>Atualizada em</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in completed_tasks %}
+            <tr>
+              <td>{{ task.title }}</td>
+              <td>{{ task.task_list.name }}</td>
+              <td>{{ task.updated_at|date:"d/m/Y H:i" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty-state">Nenhuma tarefa concluída ainda.</p>
+    {% endif %}
+  </section>
 
   <!-- Bloco 2: Próximas Tarefas -->
   <h2>Próximas Tarefas</h2>
