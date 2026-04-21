@@ -4,7 +4,7 @@ services:
     name: Taskmaster
     runtime: python
     repo: https://github.com/luizfneves404/trab1-web.git
-    buildCommand: "uv sync"
+    buildCommand: "uv sync && uv run manage.py collectstatic --noinput"
     startCommand: "uv run gunicorn trab1_web.asgi:application -k
       uvicorn.workers.UvicornWorker"
     envVars:
