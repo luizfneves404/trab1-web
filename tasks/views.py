@@ -70,6 +70,7 @@ class TaskListDetailView(LoginRequiredMixin, DetailView):
         ctx["tasks"] = (
             self.object.tasks.select_related("task_list")
             .annotate(
+                # Criamos uma ordem customizada para status, já que não é possível ordenar diretamente por ChoiceField.
                 status_rank=Case(
                     When(status=Task.Status.PENDING, then=Value(0)),
                     When(status=Task.Status.IN_PROGRESS, then=Value(1)),
@@ -96,14 +97,16 @@ class TaskListListView(LoginRequiredMixin, ListView):
         return (
             TaskList.objects.filter(user=self.request.user)
             .annotate(
-                task_count=Count("tasks"),
+                task_count=Count("tasks"),  # Total de tasks por lista.
                 pending_count=Count(
+                    # Count + Q permite contar apenas tarefas pendentes/em andamento.
                     "tasks",
                     filter=Q(
                         tasks__status__in=[Task.Status.PENDING, Task.Status.IN_PROGRESS]
                     ),
                 ),
             )
+            # Usamos prefetch_related para evitar N+1 queries ao acessar as tasks de cada lista na listagem, trazendo apenas um preview ordenado por data e título.
             .prefetch_related(
                 Prefetch(
                     "tasks", queryset=task_preview_queryset, to_attr="preview_tasks"
@@ -130,6 +133,7 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
 
     def get_initial(self):
         initial = super().get_initial()
+        # Pré-seleciona a lista de tarefas correta no formulário de criação.
         initial["task_list"] = self.get_task_list()
         return initial
 
@@ -139,6 +143,7 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
         return ctx
 
     def form_valid(self, form):
+        # Owner não vem do form para evitar manipulação.
         form.instance.owner = self.request.user
         response = super().form_valid(form)
         return response
@@ -156,6 +161,7 @@ class TaskDetailQuerysetMixin(LoginRequiredMixin):
     kwargs: dict[str, Any]
 
     def get_queryset(self):
+        # Restringe a busca à task list do usuário atual para evitar acesso cruzado entre listas.
         return Task.objects.filter(
             task_list__user=self.request.user,
             task_list_id=self.kwargs["list_pk"],
@@ -213,6 +219,7 @@ class TaskMarkDoneView(TaskDetailQuerysetMixin, SingleObjectMixin, View):
             task.status = Task.Status.DONE
             task.save(update_fields=["status", "updated_at"])
 
+        # Tentamos retornar para a página anterior usando o header Referer, ou caímos de volta para a task detail.
         next_url = request.headers.get("referer")
         if next_url:
             return redirect(next_url)
@@ -244,6 +251,7 @@ class SubTaskOwnerMixin(LoginRequiredMixin):
     kwargs: dict[str, Any]
 
     def get_subtask(self) -> SubTask:
+        # Valida subtask, task, lista e dono em uma única consulta.
         return get_object_or_404(
             SubTask,
             pk=self.kwargs["subtask_pk"],

@@ -33,7 +33,7 @@ class Task(models.Model):
     )
     task_list = models.ForeignKey(
         TaskList, on_delete=models.CASCADE, related_name="tasks"
-    )
+    )  # Permite acessar lista.tasks diretamente.
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     priority = models.CharField(
@@ -43,9 +43,13 @@ class Task(models.Model):
         max_length=15, choices=Status.choices, default=Status.PENDING
     )
     due_date = models.DateField(null=True, blank=True)
-    planned_date = models.DateField(null=True, blank=True)
+    planned_date = models.DateField(
+        null=True, blank=True
+    )  # Data planejada para execução, diferente da data de vencimento.
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )  # Atualiza automaticamente a cada save().
 
     @property
     def done(self) -> bool:

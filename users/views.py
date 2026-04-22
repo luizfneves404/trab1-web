@@ -51,6 +51,7 @@ class HomeView(LoginRequiredMixin, TemplateView):
         week_start = today - datetime.timedelta(days=today.weekday())
 
         base_qs = Task.objects.filter(owner=user)
+        # Partimos do conjunto base de tasks pendentes para reaproveitar os mesmos filtros.
         pending_qs = base_qs.filter(
             status__in=[Task.Status.PENDING, Task.Status.IN_PROGRESS]
         )
@@ -87,6 +88,7 @@ class HomeView(LoginRequiredMixin, TemplateView):
 
         seen_ids: set[int] = set()
         upcoming: list[Task] = []
+        # As três listas podem se sobrepor; deduplicamos antes de limitar o painel.
         for task in list(overdue) + list(near_due) + list(high_priority):
             if task.pk not in seen_ids:
                 seen_ids.add(task.pk)

@@ -40,6 +40,7 @@ class TaskForm(forms.ModelForm):
             "planned_date",
         ]
         widgets = {
+            # Usamos o seletor nativo de data do navegador.
             "due_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
             "planned_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
         }
@@ -48,6 +49,7 @@ class TaskForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         style_fields(self.fields)
         if user is not None:
+            # Evita que o usuário mova tasks para listas de terceiros.
             self.fields["task_list"].queryset = TaskList.objects.filter(
                 user=user
             ).order_by("name")

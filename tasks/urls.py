@@ -19,6 +19,7 @@ from .views import (
 app_name = "tasks"
 
 urlpatterns = [
+    # A lista de tarefas é a navegação principal do app; as rotas de task partem dela.
     path("lists/", TaskListListView.as_view(), name="list_list"),
     path(
         "lists/new/", TaskListCreateView.as_view(), name="list_create"
@@ -26,6 +27,7 @@ urlpatterns = [
     path("lists/<int:pk>/edit/", TaskListUpdateView.as_view(), name="list_update"),
     path("lists/<int:pk>/delete/", TaskListDeleteView.as_view(), name="list_delete"),
     path("lists/<int:pk>/", TaskListDetailView.as_view(), name="list_detail"),
+    # As tasks sempre vivem dentro de uma lista, por isso list_pk na URL.
     path(
         "lists/<int:list_pk>/tasks/new/",
         TaskCreateView.as_view(),
@@ -51,6 +53,7 @@ urlpatterns = [
         TaskMarkDoneView.as_view(),
         name="task_mark_done",
     ),
+    # Subtasks são aninhadas abaixo da task pai.
     path(
         "lists/<int:list_pk>/tasks/<int:pk>/subtasks/new/",
         SubTaskCreateView.as_view(),
