@@ -29,7 +29,7 @@
             <div class="card-body border-l-4 {% if task.priority == 'high' %}border-error{% elif task.priority == 'medium' %}border-warning{% else %}border-success{% endif %}">
               <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <h3 class="card-title">
-                  <a class="link-hover" href="{% url 'tasks:task_detail' list_pk=task_list.pk pk=task.pk %}">{{ task.title }}</a>
+                  <a class="text-base-content underline decoration-2 decoration-base-content/30 underline-offset-4 hover:decoration-base-content/60" href="{% url 'tasks:task_detail' list_pk=task_list.pk pk=task.pk %}">{{ task.title }}</a>
                 </h3>
                 <div class="flex flex-wrap gap-2">
                   <span class="badge badge-outline">{{ task.get_status_display }}</span>
