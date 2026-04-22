@@ -80,7 +80,6 @@ Depois do login, a primeira tela é o **Painel**. Ele mostra um resumo geral das
 O painel também mostra:
 
 - **Minhas Listas**: cards com as listas do usuário e a quantidade de tarefas pendentes em cada uma.
-- **Ações Rápidas**: atalhos para criar lista, iniciar criação de tarefa, ver atrasadas e ver concluídas.
 - **Tarefas atrasadas**: tabela com tarefas vencidas.
 - **Tarefas concluídas**: últimas tarefas finalizadas.
 - **Próximas Tarefas**: tarefas urgentes, próximas do prazo ou de alta prioridade.
