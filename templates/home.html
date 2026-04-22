@@ -57,42 +57,12 @@
       {% endif %}
     </section>
 
-    <section class="space-y-4" id="acoes-rapidas">
-      <h2 class="text-xl font-semibold">Ações Rápidas</h2>
-      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <a class="card bg-base-100 shadow-sm transition hover:shadow-md" href="{% url 'tasks:list_list' %}">
-          <div class="card-body">
-            <h3 class="card-title">Nova tarefa</h3>
-            <p class="text-sm text-base-content/70">Escolha uma lista para criar uma tarefa.</p>
-          </div>
-        </a>
-        <a class="card bg-base-100 shadow-sm transition hover:shadow-md" href="{% url 'tasks:list_create' %}">
-          <div class="card-body">
-            <h3 class="card-title">Nova lista</h3>
-            <p class="text-sm text-base-content/70">Crie um novo grupo de tarefas.</p>
-          </div>
-        </a>
-        <a class="card bg-base-100 shadow-sm transition hover:shadow-md" href="#tarefas-atrasadas">
-          <div class="card-body">
-            <h3 class="card-title">Ver atrasadas</h3>
-            <p class="text-sm text-base-content/70">Veja as tarefas com prazo vencido.</p>
-          </div>
-        </a>
-        <a class="card bg-base-100 shadow-sm transition hover:shadow-md" href="#tarefas-concluidas">
-          <div class="card-body">
-            <h3 class="card-title">Ver concluídas</h3>
-            <p class="text-sm text-base-content/70">Abra o resumo das tarefas finalizadas.</p>
-          </div>
-        </a>
-      </div>
-    </section>
-
     <section class="space-y-4" id="tarefas-atrasadas">
       <h2 class="text-xl font-semibold">Tarefas atrasadas</h2>
       {% if overdue_tasks %}
         <div class="overflow-x-auto rounded-box bg-base-100 shadow-sm">
           <table class="table">
-            <thead>
+            <thead class="text-base-content" style="background-color: #666666;">
               <tr>
                 <th>Título</th>
                 <th>Lista</th>
@@ -120,7 +90,7 @@
       {% if completed_tasks %}
         <div class="overflow-x-auto rounded-box bg-base-100 shadow-sm">
           <table class="table">
-            <thead>
+            <thead class="text-base-content" style="background-color: #666666;">
               <tr>
                 <th>Título</th>
                 <th>Lista</th>
@@ -148,7 +118,7 @@
       {% if upcoming_tasks %}
         <div class="overflow-x-auto rounded-box bg-base-100 shadow-sm">
           <table class="table">
-            <thead>
+            <thead class="text-base-content" style="background-color: #666666;">
               <tr>
                 <th>Título</th>
                 <th>Lista</th>

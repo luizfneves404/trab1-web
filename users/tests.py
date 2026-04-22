@@ -37,7 +37,7 @@ class AuthFlowTests(TestCase):
         self.assertEqual(out.status_code, 302)
         self.assertIn(reverse("users:login"), out.url)
 
-    def test_home_shows_list_cards_and_quick_actions(self) -> None:
+    def test_home_shows_list_cards(self) -> None:
         user = User.objects.create_user(
             "carol", "carol@example.com", "zX1!qW2@eR3#tY4$"
         )
@@ -51,7 +51,3 @@ class AuthFlowTests(TestCase):
         self.assertContains(response, "Minhas Listas")
         self.assertContains(response, "Faculdade")
         self.assertContains(response, "1 tarefa pendente")
-        self.assertContains(response, "Nova tarefa")
-        self.assertContains(response, "Nova lista")
-        self.assertContains(response, "Ver atrasadas")
-        self.assertContains(response, "Ver concluídas")
