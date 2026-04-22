@@ -68,7 +68,7 @@
           </article>
         {% empty %}
           <div class="alert">
-            Sem tarefas nesta lista. <a class="link" href="{% url 'tasks:task_create' list_pk=task_list.pk %}">Criar a primeira</a>.
+            Sem tarefas nesta lista. <a class="link" href="{% url 'tasks:task_create' list_pk=task_list.pk %}">Criar a primeira</a>
           </div>
         {% endfor %}
       </div>
