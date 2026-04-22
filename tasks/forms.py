@@ -21,6 +21,14 @@ class TaskListForm(forms.ModelForm):
     class Meta:
         model = TaskList
         fields = ["name", "description", "color"]  # O campo user é definido na view.
+        labels = {
+            "name": "Nome",
+            "description": "Descrição",
+            "color": "Cor",
+        }
+        widgets = {
+            "color": forms.TextInput(attrs={"type": "color"}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -39,6 +47,15 @@ class TaskForm(forms.ModelForm):
             "due_date",
             "planned_date",
         ]
+        labels = {
+            "task_list": "Lista",
+            "title": "Título",
+            "description": "Descrição",
+            "priority": "Prioridade",
+            "status": "Status",
+            "due_date": "Data de vencimento",
+            "planned_date": "Data planejada",
+        }
         widgets = {
             # Usamos o seletor nativo de data do navegador.
             "due_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
@@ -59,6 +76,9 @@ class SubTaskForm(forms.ModelForm):
     class Meta:
         model = SubTask
         fields = ["title"]
+        labels = {
+            "title": "Título",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
