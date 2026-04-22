@@ -23,6 +23,12 @@ Apply the migrations:
 python manage.py migrate
 ```
 
+Configure email in production with Resend:
+```bash
+RESEND_API_KEY=re_...
+DEFAULT_FROM_EMAIL=noreply@example.com
+```
+
 Create a superuser (if you want to access the admin panel):
 ```bash
 python manage.py createsuperuser

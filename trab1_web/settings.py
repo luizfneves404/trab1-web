@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -28,6 +29,8 @@ class AppSettings(BaseSettings):
     DEBUG: bool = False
     ALLOWED_HOSTS: list[str] = Field(...)
     DATABASE_URL: SecretStr | None = Field(...)
+    DEFAULT_FROM_EMAIL: str = "noreply@localhost"
+    RESEND_API_KEY: SecretStr | None = None
 
     model_config = SettingsConfigDict(env_file=".env")
 
@@ -57,6 +60,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "anymail",
     "tasks",
     "users",
 ]
@@ -168,16 +172,22 @@ LOGIN_REDIRECT_URL = reverse_lazy("home")
 LOGIN_URL = reverse_lazy("users:login")
 LOGOUT_REDIRECT_URL = reverse_lazy("users:login")
 
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@localhost")
+DEFAULT_FROM_EMAIL = config.DEFAULT_FROM_EMAIL
 if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-    EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
-    EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
-    EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "1") == "1"
-    EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
-    EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+    _resend_api_key = (
+        config.RESEND_API_KEY.get_secret_value().strip()
+        if config.RESEND_API_KEY
+        else ""
+    )
+    if not _resend_api_key:
+        raise ImproperlyConfigured("RESEND_API_KEY must be set when DEBUG is false.")
+
+    EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+    ANYMAIL = {
+        "RESEND_API_KEY": _resend_api_key,
+    }
 
 
 LOGGING = {

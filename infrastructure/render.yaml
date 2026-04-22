@@ -14,3 +14,7 @@ services:
         value: "[\"trab1-web.onrender.com\"]"
       - key: DATABASE_URL
         sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
