@@ -1,249 +1,197 @@
 {% extends "base.html" %}
-{% block title %}Painel — Trab1 Web{% endblock %}
+
+{% block title %}Painel - Trab1 Web{% endblock %}
+
 {% block content %}
-<style>
-  .dashboard { max-width: 900px; margin: 0 auto; font-family: sans-serif; }
-  h1 { margin-bottom: 0.25rem; }
-  .subtitle { color: #666; margin-bottom: 2rem; }
-
-  /* Bloco 1 */
-  .summary-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2.5rem;
-  }
-  .card {
-    border-radius: 8px;
-    padding: 1.25rem 1rem;
-    text-align: center;
-    color: #fff;
-  }
-  .card-number { font-size: 2.5rem; font-weight: 700; line-height: 1; }
-  .card-label { font-size: 0.85rem; margin-top: 0.4rem; opacity: 0.9; }
-  .card-pending  { background: #5b8dee; }
-  .card-overdue  { background: #e05c5c; }
-  .card-today    { background: #f0a500; }
-  .card-done     { background: #4caf82; }
-
-  /* Bloco 2 */
-  h2 { font-size: 1.2rem; margin-bottom: 0.75rem; }
-  .task-table { width: 100%; border-collapse: collapse; }
-  .task-table th,
-  .task-table td { padding: 0.6rem 0.75rem; text-align: left; border-bottom: 1px solid #e0e0e0; font-size: 0.9rem; }
-  .task-table th { background: #f5f5f5; font-weight: 600; }
-  .badge {
-    display: inline-block;
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.78rem;
-    font-weight: 600;
-  }
-  .badge-high    { background: #fde8e8; color: #c0392b; }
-  .badge-medium  { background: #fef3cd; color: #856404; }
-  .badge-low     { background: #e8f5e9; color: #2e7d32; }
-  .badge-overdue { background: #fde8e8; color: #c0392b; }
-  .badge-today   { background: #fff3cd; color: #856404; }
-  .badge-soon    { background: #e3f2fd; color: #1565c0; }
-  .empty-state { color: #888; font-style: italic; padding: 1rem 0; }
-  .section { margin-bottom: 2.5rem; }
-  .list-grid,
-  .action-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-  }
-  .list-card,
-  .action-card {
-    display: block;
-    border: 1px solid #d9d9d9;
-    border-radius: 10px;
-    padding: 1rem;
-    text-decoration: none;
-    color: inherit;
-    background: #fff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  }
-  .list-card:hover,
-  .action-card:hover {
-    border-color: #b9c7e6;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-  .list-card h3,
-  .action-card h3 {
-    margin: 0 0 0.35rem;
-    font-size: 1rem;
-  }
-  .list-card p,
-  .action-card p {
-    margin: 0;
-    color: #666;
-  }
-  .action-primary { border-color: #5b8dee; }
-  .action-accent { border-color: #4caf82; }
-  .action-warn { border-color: #f0a500; }
-  .action-muted { border-color: #9e9e9e; }
-</style>
-
-<div class="dashboard">
-  <h1>Painel</h1>
-  <p class="subtitle">Olá, {{ user.username }}.</p>
-
-  <!-- Bloco 1: Resumo Geral -->
-  <div class="summary-grid">
-    <div class="card card-pending">
-      <div class="card-number">{{ count_pending }}</div>
-      <div class="card-label">Pendentes</div>
+  <div class="space-y-8">
+    <div>
+      <h1 class="text-3xl font-bold">Painel</h1>
+      <p class="mt-1 text-base-content/70">Olá, {{ user.username }}.</p>
     </div>
-    <div class="card card-overdue">
-      <div class="card-number">{{ count_overdue }}</div>
-      <div class="card-label">Vencidas</div>
-    </div>
-    <div class="card card-today">
-      <div class="card-number">{{ count_today }}</div>
-      <div class="card-label">Para hoje</div>
-    </div>
-    <div class="card card-done">
-      <div class="card-number">{{ count_completed_week }}</div>
-      <div class="card-label">Concluídas na semana</div>
-    </div>
-  </div>
 
-  <!-- Bloco 3: Minhas Listas -->
-  <section class="section" id="minhas-listas">
-    <h2>Minhas Listas</h2>
-    {% if task_lists %}
-      <div class="list-grid">
-        {% for lst in task_lists %}
-          <a class="list-card" href="{% url 'tasks:list_detail' lst.pk %}">
-            <h3>{{ lst.name }}</h3>
-            <p>{{ lst.pending_count }} tarefa{{ lst.pending_count|pluralize }} pendente{{ lst.pending_count|pluralize }}</p>
-          </a>
-        {% endfor %}
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="stats bg-primary text-primary-content shadow">
+        <div class="stat">
+          <div class="stat-value">{{ count_pending }}</div>
+          <div class="stat-title text-primary-content/80">Pendentes</div>
+        </div>
       </div>
-    {% else %}
-      <p class="empty-state">Você ainda não tem listas. Crie a primeira para começar.</p>
-    {% endif %}
-  </section>
-
-  <!-- Bloco 4: Ações Rápidas -->
-  <section class="section" id="acoes-rapidas">
-    <h2>Ações Rápidas</h2>
-    <div class="action-grid">
-      <a class="action-card action-primary" href="{% url 'tasks:list_list' %}">
-        <h3>Nova tarefa</h3>
-        <p>Escolha uma lista para criar uma tarefa.</p>
-      </a>
-      <a class="action-card action-accent" href="{% url 'tasks:list_create' %}">
-        <h3>Nova lista</h3>
-        <p>Crie um novo grupo de tarefas.</p>
-      </a>
-      <a class="action-card action-warn" href="#tarefas-atrasadas">
-        <h3>Ver atrasadas</h3>
-        <p>Veja as tarefas com prazo vencido.</p>
-      </a>
-      <a class="action-card action-muted" href="#tarefas-concluidas">
-        <h3>Ver concluídas</h3>
-        <p>Abra o resumo das tarefas finalizadas.</p>
-      </a>
+      <div class="stats bg-error text-error-content shadow">
+        <div class="stat">
+          <div class="stat-value">{{ count_overdue }}</div>
+          <div class="stat-title text-error-content/80">Vencidas</div>
+        </div>
+      </div>
+      <div class="stats bg-warning text-warning-content shadow">
+        <div class="stat">
+          <div class="stat-value">{{ count_today }}</div>
+          <div class="stat-title text-warning-content/80">Para hoje</div>
+        </div>
+      </div>
+      <div class="stats bg-success text-success-content shadow">
+        <div class="stat">
+          <div class="stat-value">{{ count_completed_week }}</div>
+          <div class="stat-title text-success-content/80">Concluídas na semana</div>
+        </div>
+      </div>
     </div>
-  </section>
 
-  <section class="section" id="tarefas-atrasadas">
-    <h2>Tarefas atrasadas</h2>
-    {% if overdue_tasks %}
-      <table class="task-table">
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Lista</th>
-            <th>Prazo</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for task in overdue_tasks %}
-            <tr>
-              <td>{{ task.title }}</td>
-              <td>{{ task.task_list.name }}</td>
-              <td>{{ task.due_date|date:"d/m/Y" }}</td>
-            </tr>
+    <section class="space-y-4" id="minhas-listas">
+      <h2 class="text-xl font-semibold">Minhas Listas</h2>
+      {% if task_lists %}
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {% for lst in task_lists %}
+            <a class="card bg-base-100 shadow-sm transition hover:shadow-md" href="{% url 'tasks:list_detail' lst.pk %}">
+              <div class="card-body">
+                <h3 class="card-title">{{ lst.name }}</h3>
+                <p class="text-base-content/70">{{ lst.pending_count }} tarefa{{ lst.pending_count|pluralize }} pendente{{ lst.pending_count|pluralize }}</p>
+              </div>
+            </a>
           {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <p class="empty-state">Nenhuma tarefa atrasada no momento.</p>
-    {% endif %}
-  </section>
+        </div>
+      {% else %}
+        <div class="alert">Você ainda não tem listas. Crie a primeira para começar.</div>
+      {% endif %}
+    </section>
 
-  <section class="section" id="tarefas-concluidas">
-    <h2>Tarefas concluídas</h2>
-    {% if completed_tasks %}
-      <table class="task-table">
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Lista</th>
-            <th>Atualizada em</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for task in completed_tasks %}
-            <tr>
-              <td>{{ task.title }}</td>
-              <td>{{ task.task_list.name }}</td>
-              <td>{{ task.updated_at|date:"d/m/Y H:i" }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <p class="empty-state">Nenhuma tarefa concluída ainda.</p>
-    {% endif %}
-  </section>
+    <section class="space-y-4" id="acoes-rapidas">
+      <h2 class="text-xl font-semibold">Ações Rápidas</h2>
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <a class="card bg-base-100 shadow-sm transition hover:shadow-md" href="{% url 'tasks:list_list' %}">
+          <div class="card-body">
+            <h3 class="card-title">Nova tarefa</h3>
+            <p class="text-sm text-base-content/70">Escolha uma lista para criar uma tarefa.</p>
+          </div>
+        </a>
+        <a class="card bg-base-100 shadow-sm transition hover:shadow-md" href="{% url 'tasks:list_create' %}">
+          <div class="card-body">
+            <h3 class="card-title">Nova lista</h3>
+            <p class="text-sm text-base-content/70">Crie um novo grupo de tarefas.</p>
+          </div>
+        </a>
+        <a class="card bg-base-100 shadow-sm transition hover:shadow-md" href="#tarefas-atrasadas">
+          <div class="card-body">
+            <h3 class="card-title">Ver atrasadas</h3>
+            <p class="text-sm text-base-content/70">Veja as tarefas com prazo vencido.</p>
+          </div>
+        </a>
+        <a class="card bg-base-100 shadow-sm transition hover:shadow-md" href="#tarefas-concluidas">
+          <div class="card-body">
+            <h3 class="card-title">Ver concluídas</h3>
+            <p class="text-sm text-base-content/70">Abra o resumo das tarefas finalizadas.</p>
+          </div>
+        </a>
+      </div>
+    </section>
 
-  <!-- Bloco 2: Próximas Tarefas -->
-  <h2>Próximas Tarefas</h2>
-  {% if upcoming_tasks %}
-    <table class="task-table">
-      <thead>
-        <tr>
-          <th>Título</th>
-          <th>Lista</th>
-          <th>Prioridade</th>
-          <th>Prazo</th>
-          <th>Situação</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for task in upcoming_tasks %}
-          <tr>
-            <td>{{ task.title }}</td>
-            <td>{{ task.task_list.name }}</td>
-            <td>
-              <span class="badge badge-{{ task.priority }}">{{ task.get_priority_display }}</span>
-            </td>
-            <td>
-              {% if task.due_date %}
-                {{ task.due_date|date:"d/m/Y" }}
-              {% else %}
-                —
-              {% endif %}
-            </td>
-            <td>
-              {% if task.due_date and task.due_date < today %}
-                <span class="badge badge-overdue">Vencida</span>
-              {% elif task.due_date == today %}
-                <span class="badge badge-today">Hoje</span>
-              {% else %}
-                <span class="badge badge-soon">Em breve</span>
-              {% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p class="empty-state">Nenhuma tarefa urgente no momento.</p>
-  {% endif %}
-</div>
+    <section class="space-y-4" id="tarefas-atrasadas">
+      <h2 class="text-xl font-semibold">Tarefas atrasadas</h2>
+      {% if overdue_tasks %}
+        <div class="overflow-x-auto rounded-box bg-base-100 shadow-sm">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Lista</th>
+                <th>Prazo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for task in overdue_tasks %}
+                <tr>
+                  <td>{{ task.title }}</td>
+                  <td>{{ task.task_list.name }}</td>
+                  <td>{{ task.due_date|date:"d/m/Y" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="alert">Nenhuma tarefa atrasada no momento.</div>
+      {% endif %}
+    </section>
+
+    <section class="space-y-4" id="tarefas-concluidas">
+      <h2 class="text-xl font-semibold">Tarefas concluídas</h2>
+      {% if completed_tasks %}
+        <div class="overflow-x-auto rounded-box bg-base-100 shadow-sm">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Lista</th>
+                <th>Atualizada em</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for task in completed_tasks %}
+                <tr>
+                  <td>{{ task.title }}</td>
+                  <td>{{ task.task_list.name }}</td>
+                  <td>{{ task.updated_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="alert">Nenhuma tarefa concluída ainda.</div>
+      {% endif %}
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-xl font-semibold">Próximas Tarefas</h2>
+      {% if upcoming_tasks %}
+        <div class="overflow-x-auto rounded-box bg-base-100 shadow-sm">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Lista</th>
+                <th>Prioridade</th>
+                <th>Prazo</th>
+                <th>Situação</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for task in upcoming_tasks %}
+                <tr>
+                  <td>{{ task.title }}</td>
+                  <td>{{ task.task_list.name }}</td>
+                  <td>
+                    {% if task.priority == "high" %}
+                      <span class="badge badge-error">{{ task.get_priority_display }}</span>
+                    {% elif task.priority == "medium" %}
+                      <span class="badge badge-warning">{{ task.get_priority_display }}</span>
+                    {% else %}
+                      <span class="badge badge-success">{{ task.get_priority_display }}</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if task.due_date %}
+                      {{ task.due_date|date:"d/m/Y" }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if task.due_date and task.due_date < today %}
+                      <span class="badge badge-error">Vencida</span>
+                    {% elif task.due_date == today %}
+                      <span class="badge badge-warning">Hoje</span>
+                    {% else %}
+                      <span class="badge badge-info">Em breve</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="alert">Nenhuma tarefa urgente no momento.</div>
+      {% endif %}
+    </section>
+  </div>
 {% endblock %}

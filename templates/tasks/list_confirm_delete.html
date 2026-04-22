@@ -1,9 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-  <h2>Excluir Lista</h2>
-  <form method="post">{% csrf_token %}
-    <p>Tem certeza de que deseja excluir "{{ object.name }}"?</p>
-    <button type="submit">Sim</button>
-    <a href="{% url 'tasks:list_detail' object.pk %}">Cancelar</a>
-  </form>
+  <div class="mx-auto max-w-xl">
+    <section class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <h1 class="card-title text-3xl">Excluir Lista</h1>
+        <form method="post">
+          {% csrf_token %}
+          <p>Tem certeza de que deseja excluir "{{ object.name }}"?</p>
+          <div class="flex flex-wrap gap-2">
+            <button class="btn btn-error" type="submit">Sim</button>
+            <a class="btn btn-ghost" href="{% url 'tasks:list_detail' object.pk %}">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
 {% endblock %}

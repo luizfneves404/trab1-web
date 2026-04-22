@@ -1,8 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-  <h2>{% if object %}Editar Lista{% else %}Nova Lista{% endif %}</h2>
-  <form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Salvar</button>
-  </form>
+  <div class="mx-auto max-w-2xl">
+    <section class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <h1 class="card-title text-3xl">{% if object %}Editar Lista{% else %}Nova Lista{% endif %}</h1>
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button class="btn btn-primary" type="submit">Salvar</button>
+        </form>
+      </div>
+    </section>
+  </div>
 {% endblock %}

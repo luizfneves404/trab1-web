@@ -1,48 +1,77 @@
 {% extends "base.html" %}
-{% block content %}
-  <p><a href="{% url 'tasks:list_list' %}">Voltar para listas</a></p>
-  <h1>{{ task_list.name }}</h1>
-  {% if task_list.description %}
-    <p>{{ task_list.description }}</p>
-  {% endif %}
-  <p>
-    <a href="{% url 'tasks:task_create' list_pk=task_list.pk %}">Nova tarefa</a>
-    ·
-    <a href="{% url 'tasks:list_update' task_list.pk %}">Editar lista</a>
-    ·
-    <a href="{% url 'tasks:list_delete' task_list.pk %}">Excluir lista</a>
-  </p>
 
-  <h2>Tarefas</h2>
-  <p>{{ task_count }} tarefa{{ task_count|pluralize }}</p>
-  <div style="display:grid; gap:12px;">
-    {% for task in tasks %}
-      <article style="border:1px solid #ccc; border-left:6px solid {% if task.priority == 'high' %}#c00{% elif task.priority == 'medium' %}#e67e22{% else %}#2a7{% endif %}; padding:12px; border-radius:6px;">
-        <h3 style="margin-top:0;"><a href="{% url 'tasks:task_detail' list_pk=task_list.pk pk=task.pk %}">{{ task.title }}</a></h3>
-        <p>Status: {{ task.get_status_display }} · Prioridade: {{ task.get_priority_display }}</p>
-        {% if task.description %}
-          <p>{{ task.description }}</p>
+{% block title %}{{ task_list.name }}{% endblock %}
+
+{% block content %}
+  <div class="space-y-6">
+    <a class="btn btn-ghost btn-sm" href="{% url 'tasks:list_list' %}">Voltar para listas</a>
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <h1 class="text-3xl font-bold">{{ task_list.name }}</h1>
+        {% if task_list.description %}
+          <p class="mt-2 text-base-content/70">{{ task_list.description }}</p>
         {% endif %}
-        <p>
-          {% if task.planned_date %}Planejada: {{ task.planned_date }}{% endif %}
-          {% if task.due_date %}{% if task.planned_date %} · {% endif %}Prazo: {{ task.due_date }}{% endif %}
-        </p>
-        <p>
-          <a href="{% url 'tasks:task_update' list_pk=task_list.pk pk=task.pk %}">Editar</a>
-          ·
-          <a href="{% url 'tasks:task_delete' list_pk=task_list.pk pk=task.pk %}">Excluir</a>
-        </p>
-        {% if task.status != 'done' %}
-          <form action="{% url 'tasks:task_mark_done' list_pk=task_list.pk pk=task.pk %}" method="post" style="margin:0;">
-            {% csrf_token %}
-            <button type="submit">Marcar como concluída</button>
-          </form>
-        {% else %}
-          <p style="margin:0;"><strong>Concluída</strong></p>
-        {% endif %}
-      </article>
-    {% empty %}
-      <p>Sem tarefas nesta lista. <a href="{% url 'tasks:task_create' list_pk=task_list.pk %}">Criar a primeira</a>.</p>
-    {% endfor %}
+        <p class="mt-2 text-sm text-base-content/60">{{ task_count }} tarefa{{ task_count|pluralize }}</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <a class="btn btn-primary" href="{% url 'tasks:task_create' list_pk=task_list.pk %}">Nova tarefa</a>
+        <a class="btn btn-ghost" href="{% url 'tasks:list_update' task_list.pk %}">Editar lista</a>
+        <a class="btn btn-error btn-outline" href="{% url 'tasks:list_delete' task_list.pk %}">Excluir lista</a>
+      </div>
+    </div>
+
+    <section class="space-y-4">
+      <h2 class="text-xl font-semibold">Tarefas</h2>
+      <div class="grid gap-4">
+        {% for task in tasks %}
+          <article class="card bg-base-100 shadow-sm">
+            <div class="card-body border-l-4 {% if task.priority == 'high' %}border-error{% elif task.priority == 'medium' %}border-warning{% else %}border-success{% endif %}">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <h3 class="card-title">
+                  <a class="link-hover" href="{% url 'tasks:task_detail' list_pk=task_list.pk pk=task.pk %}">{{ task.title }}</a>
+                </h3>
+                <div class="flex flex-wrap gap-2">
+                  <span class="badge badge-outline">{{ task.get_status_display }}</span>
+                  {% if task.priority == "high" %}
+                    <span class="badge badge-error">{{ task.get_priority_display }}</span>
+                  {% elif task.priority == "medium" %}
+                    <span class="badge badge-warning">{{ task.get_priority_display }}</span>
+                  {% else %}
+                    <span class="badge badge-success">{{ task.get_priority_display }}</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              {% if task.description %}
+                <p class="text-base-content/70">{{ task.description }}</p>
+              {% endif %}
+
+              <p class="text-sm text-base-content/60">
+                {% if task.planned_date %}Planejada: {{ task.planned_date }}{% endif %}
+                {% if task.due_date %}{% if task.planned_date %} · {% endif %}Prazo: {{ task.due_date }}{% endif %}
+              </p>
+
+              <div class="card-actions">
+                <a class="btn btn-ghost btn-sm" href="{% url 'tasks:task_update' list_pk=task_list.pk pk=task.pk %}">Editar</a>
+                <a class="btn btn-error btn-outline btn-sm" href="{% url 'tasks:task_delete' list_pk=task_list.pk pk=task.pk %}">Excluir</a>
+                {% if task.status != "done" %}
+                  <form action="{% url 'tasks:task_mark_done' list_pk=task_list.pk pk=task.pk %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-success btn-sm" type="submit">Marcar como concluída</button>
+                  </form>
+                {% else %}
+                  <span class="badge badge-success">Concluída</span>
+                {% endif %}
+              </div>
+            </div>
+          </article>
+        {% empty %}
+          <div class="alert">
+            Sem tarefas nesta lista. <a class="link" href="{% url 'tasks:task_create' list_pk=task_list.pk %}">Criar a primeira</a>.
+          </div>
+        {% endfor %}
+      </div>
+    </section>
   </div>
 {% endblock %}

@@ -3,11 +3,17 @@
 {% block title %}Excluir tarefa{% endblock %}
 
 {% block content %}
-  <p><a href="{% url 'tasks:task_detail' list_pk=object.task_list.pk pk=object.pk %}">Voltar</a></p>
-  <h1>Excluir tarefa</h1>
-  <p>Tem certeza de que deseja excluir "{{ object.title }}"?</p>
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit">Sim, excluir</button>
-  </form>
+  <div class="mx-auto max-w-xl space-y-4">
+    <a class="btn btn-ghost btn-sm" href="{% url 'tasks:task_detail' list_pk=object.task_list.pk pk=object.pk %}">Voltar</a>
+    <section class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <h1 class="card-title text-3xl">Excluir tarefa</h1>
+        <p>Tem certeza de que deseja excluir "{{ object.title }}"?</p>
+        <form method="post">
+          {% csrf_token %}
+          <button class="btn btn-error" type="submit">Sim, excluir</button>
+        </form>
+      </div>
+    </section>
+  </div>
 {% endblock %}

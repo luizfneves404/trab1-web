@@ -1,166 +1,69 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
   <head>
     {% load static %}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>
-      {% block title %}Trab1 Web{% endblock %}
-    </title>
+    <title>{% block title %}Trab1 Web{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-      :root {
-        --header-height: 72px;
-        --header-bg: #111827;
-        --header-border: rgba(255, 255, 255, 0.08);
-        --header-link: #e5e7eb;
-        --header-link-hover: #ffffff;
+      form p {
+        margin-bottom: 1rem;
       }
 
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        padding-top: var(--header-height);
-        font-family: Arial, sans-serif;
-        background: #f7f7f8;
-        color: #111827;
-      }
-
-      .topbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-        height: var(--header-height);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--header-bg);
-        border-bottom: 1px solid var(--header-border);
-        padding: 0 1.25rem;
-      }
-
-      .topbar__inner {
-        width: 100%;
-        max-width: 1200px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-      }
-
-      .topbar__brand {
-        display: inline-flex;
-        align-items: center;
-        gap: 0;
-        color: var(--header-link-hover);
-        text-decoration: none;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-        white-space: nowrap;
-        overflow: visible;
-      }
-
-      .topbar__brand img {
+      form p label {
         display: block;
-        height: 120px;
-        width: auto;
-        object-fit: contain;
-        transform: scale(0.5);
-        transform-origin: left center;
+        margin-bottom: 0.35rem;
+        font-weight: 600;
       }
 
-      .topbar__nav {
-        display: flex;
-        align-items: center;
-        gap: 0.9rem;
-        flex-wrap: wrap;
-        justify-content: flex-end;
+      form p .helptext {
+        display: block;
+        margin-top: 0.35rem;
+        color: color-mix(in oklab, currentColor 60%, transparent);
+        font-size: 0.875rem;
       }
 
-      .topbar__nav a,
-      .topbar__nav button {
-        color: var(--header-link);
-        background: transparent;
-        border: 0;
-        font: inherit;
-        text-decoration: none;
-        cursor: pointer;
-        padding: 0.45rem 0.6rem;
-        border-radius: 0.5rem;
-      }
-
-      .topbar__nav a:hover,
-      .topbar__nav button:hover {
-        color: var(--header-link-hover);
-        background: rgba(255, 255, 255, 0.08);
-      }
-
-      .topbar__form {
-        margin: 0;
-      }
-
-      main {
-        padding: 1.5rem;
-      }
-
-      @media (max-width: 640px) {
-        :root {
-          --header-height: auto;
-        }
-
-        body {
-          padding-top: 0;
-        }
-
-        .topbar {
-          position: sticky;
-          height: auto;
-          padding: 0.75rem 1rem;
-        }
-
-        .topbar__inner {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-
-        .topbar__nav {
-          justify-content: flex-start;
-        }
+      form p ul,
+      .errorlist {
+        margin-top: 0.5rem;
+        padding-left: 1.25rem;
+        color: var(--color-error);
+        font-size: 0.875rem;
       }
     </style>
   </head>
-  <body>
-    <header class="topbar">
-      <div class="topbar__inner">
-        <a class="topbar__brand" href="{% url 'home' %}" aria-label="Taskmaster">
-          <img src="{% static 'images/taskmaster.png' %}" alt="" />
-        </a>
-        <nav class="topbar__nav" aria-label="Navegação principal">
-          <a href="{% url 'home' %}">Início</a>
+  <body class="min-h-screen bg-base-200 text-base-content">
+    <header class="navbar sticky top-0 z-50 border-b border-base-300 bg-base-100 px-4 shadow-sm">
+      <div class="mx-auto flex w-full max-w-6xl flex-col gap-3 sm:flex-row">
+        <div class="flex-1">
+          <a class="btn btn-ghost h-16 px-2" href="{% url 'home' %}" aria-label="Taskmaster">
+            <img class="h-20 w-auto object-contain" src="{% static 'images/taskmaster.png' %}" alt="" />
+          </a>
+        </div>
+        <nav class="flex flex-wrap items-center gap-2" aria-label="Navegação principal">
+          <a class="btn btn-ghost btn-sm" href="{% url 'home' %}">Início</a>
           {% if user.is_authenticated %}
-            <a href="{% url 'tasks:list_list' %}">Ver listas</a>
-            <form class="topbar__form" action="{% url 'users:logout' %}" method="post">
+            <a class="btn btn-ghost btn-sm" href="{% url 'tasks:list_list' %}">Ver listas</a>
+            <form action="{% url 'users:logout' %}" method="post">
               {% csrf_token %}
-              <button type="submit">Sair</button>
+              <button class="btn btn-outline btn-sm" type="submit">Sair</button>
             </form>
           {% else %}
-            <a href="{% url 'users:login' %}">Entrar</a>
-            <a href="{% url 'users:register' %}">Cadastrar</a>
+            <a class="btn btn-ghost btn-sm" href="{% url 'users:login' %}">Entrar</a>
+            <a class="btn btn-primary btn-sm" href="{% url 'users:register' %}">Cadastrar</a>
           {% endif %}
         </nav>
       </div>
     </header>
-    <main>
+    <main class="mx-auto w-full max-w-6xl px-4 py-8">
       {% if messages %}
-        <ul>
+        <div class="mb-6 space-y-2">
           {% for message in messages %}
-            <li>{{ message }}</li>
+            <div class="alert alert-info">{{ message }}</div>
           {% endfor %}
-        </ul>
+        </div>
       {% endif %}
       {% block content %}{% endblock %}
     </main>

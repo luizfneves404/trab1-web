@@ -22,7 +22,7 @@ from django.views.generic import CreateView, TemplateView
 from tasks.models import Task
 from tasks.models import TaskList
 
-from .forms import RegistrationForm
+from .forms import LoginForm, NewPasswordForm, RegistrationForm, ResetPasswordForm
 
 
 @method_decorator(
@@ -105,11 +105,13 @@ register_view = RegisterView.as_view()
 home_view = HomeView.as_view()
 login_view = LoginView.as_view(
     template_name="registration/login.html",
+    authentication_form=LoginForm,
     redirect_authenticated_user=True,
 )
 logout_view = LogoutView.as_view(next_page=reverse_lazy("users:login"))
 password_reset_view = PasswordResetView.as_view(
     template_name="registration/password_reset_form.html",
+    form_class=ResetPasswordForm,
     email_template_name="registration/password_reset_email.html",
     subject_template_name="registration/password_reset_subject.txt",
     success_url=reverse_lazy("users:password_reset_done"),
@@ -119,6 +121,7 @@ password_reset_done_view = PasswordResetDoneView.as_view(
 )
 password_reset_confirm_view = PasswordResetConfirmView.as_view(
     template_name="registration/password_reset_confirm.html",
+    form_class=NewPasswordForm,
     success_url=reverse_lazy("users:password_reset_complete"),
 )
 password_reset_complete_view = PasswordResetCompleteView.as_view(

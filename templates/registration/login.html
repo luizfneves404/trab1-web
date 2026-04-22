@@ -1,15 +1,23 @@
 {% extends "base.html" %}
 {% block title %}
-  Entrar — Trab1 Web
+  Entrar - Trab1 Web
 {% endblock %}
 {% block content %}
-  <h1>Entrar</h1>
-  <form method="post" action="{% url 'users:login' %}">
-    {% csrf_token %}
-    {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
-    {{ form.as_p }}
-    <button type="submit">Entrar</button>
-  </form>
-  <p><a href="{% url 'users:register' %}">Criar conta</a></p>
-  <p><a href="{% url 'users:password_reset' %}">Esqueceu a senha?</a></p>
+  <div class="mx-auto max-w-md">
+    <section class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <h1 class="card-title text-3xl">Entrar</h1>
+        <form method="post" action="{% url 'users:login' %}">
+          {% csrf_token %}
+          {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
+          {{ form.as_p }}
+          <button class="btn btn-primary w-full" type="submit">Entrar</button>
+        </form>
+        <div class="flex flex-wrap gap-3 text-sm">
+          <a class="link" href="{% url 'users:register' %}">Criar conta</a>
+          <a class="link" href="{% url 'users:password_reset' %}">Esqueceu a senha?</a>
+        </div>
+      </div>
+    </section>
+  </div>
 {% endblock %}

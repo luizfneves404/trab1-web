@@ -3,59 +3,117 @@
 {% block title %}{{ task.title }}{% endblock %}
 
 {% block content %}
-  <p><a href="{% url 'tasks:list_detail' task.task_list.pk %}">Voltar para {{ task.task_list.name }}</a></p>
-  <h1>{{ task.title }}</h1>
-  <p>Status: {{ task.get_status_display }} · Prioridade: {{ task.get_priority_display }}</p>
-  {% if task.description %}
-    <p>{{ task.description }}</p>
-  {% endif %}
-  <ul>
-    <li>Lista: {{ task.task_list.name }}</li>
-    {% if task.planned_date %}<li>Planejada para: {{ task.planned_date }}</li>{% endif %}
-    {% if task.due_date %}<li>Prazo: {{ task.due_date }}</li>{% endif %}
-    <li>Criada em: {{ task.created_at }}</li>
-    <li>Atualizada em: {{ task.updated_at }}</li>
-  </ul>
-  <p>
-    <a href="{% url 'tasks:task_update' list_pk=task.task_list.pk pk=task.pk %}">Editar</a>
-    ·
-    <a href="{% url 'tasks:task_delete' list_pk=task.task_list.pk pk=task.pk %}">Excluir</a>
-  </p>
-  {% if task.status != 'done' %}
-    <form action="{% url 'tasks:task_mark_done' list_pk=task.task_list.pk pk=task.pk %}" method="post">
-      {% csrf_token %}
-      <button type="submit">Marcar como concluída</button>
-    </form>
-  {% else %}
-    <p><strong>Concluída</strong></p>
-  {% endif %}
+  <div class="space-y-6">
+    <a class="btn btn-ghost btn-sm" href="{% url 'tasks:list_detail' task.task_list.pk %}">Voltar para {{ task.task_list.name }}</a>
 
-  <h2>Subtarefas</h2>
-  <form action="{% url 'tasks:subtask_create' list_pk=task.task_list.pk pk=task.pk %}" method="post">
-    {% csrf_token %}
-    {{ subtask_form.as_p }}
-    <button type="submit">Adicionar subtarefa</button>
-  </form>
+    <section class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 class="card-title text-3xl">{{ task.title }}</h1>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <span class="badge badge-outline">{{ task.get_status_display }}</span>
+              {% if task.priority == "high" %}
+                <span class="badge badge-error">{{ task.get_priority_display }}</span>
+              {% elif task.priority == "medium" %}
+                <span class="badge badge-warning">{{ task.get_priority_display }}</span>
+              {% else %}
+                <span class="badge badge-success">{{ task.get_priority_display }}</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <a class="btn btn-ghost" href="{% url 'tasks:task_update' list_pk=task.task_list.pk pk=task.pk %}">Editar</a>
+            <a class="btn btn-error btn-outline" href="{% url 'tasks:task_delete' list_pk=task.task_list.pk pk=task.pk %}">Excluir</a>
+          </div>
+        </div>
 
-  <ul>
-    {% for subtask in subtasks %}
-      <li>
-        <form action="{% url 'tasks:subtask_toggle' list_pk=task.task_list.pk pk=task.pk subtask_pk=subtask.pk %}" method="post" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit">{% if subtask.done %}Desmarcar{% else %}Concluir{% endif %}</button>
-        </form>
-        {% if subtask.done %}
-          <s>{{ subtask.title }}</s>
-        {% else %}
-          {{ subtask.title }}
+        {% if task.description %}
+          <p class="text-base-content/70">{{ task.description }}</p>
         {% endif %}
-        <form action="{% url 'tasks:subtask_delete' list_pk=task.task_list.pk pk=task.pk subtask_pk=subtask.pk %}" method="post" style="display:inline;">
+
+        <div class="overflow-x-auto">
+          <table class="table">
+            <tbody>
+              <tr>
+                <th>Lista</th>
+                <td>{{ task.task_list.name }}</td>
+              </tr>
+              {% if task.planned_date %}
+                <tr>
+                  <th>Planejada para</th>
+                  <td>{{ task.planned_date }}</td>
+                </tr>
+              {% endif %}
+              {% if task.due_date %}
+                <tr>
+                  <th>Prazo</th>
+                  <td>{{ task.due_date }}</td>
+                </tr>
+              {% endif %}
+              <tr>
+                <th>Criada em</th>
+                <td>{{ task.created_at }}</td>
+              </tr>
+              <tr>
+                <th>Atualizada em</th>
+                <td>{{ task.updated_at }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {% if task.status != "done" %}
+          <form action="{% url 'tasks:task_mark_done' list_pk=task.task_list.pk pk=task.pk %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-success" type="submit">Marcar como concluída</button>
+          </form>
+        {% else %}
+          <span class="badge badge-success">Concluída</span>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title">Subtarefas</h2>
+        <form class="flex flex-col gap-3 sm:flex-row sm:items-end" action="{% url 'tasks:subtask_create' list_pk=task.task_list.pk pk=task.pk %}" method="post">
           {% csrf_token %}
-          <button type="submit">Excluir</button>
+          <div class="join w-full">
+            <input
+              name="title"
+              type="text"
+              placeholder="Nova subtarefa..."
+              class="input input-bordered join-item flex-1"
+            />
+            <button class="btn btn-primary join-item" type="submit">Adicionar</button>
+          </div>
         </form>
-      </li>
-    {% empty %}
-      <li>Sem subtarefas</li>
-    {% endfor %}
-  </ul>
+
+        <div class="divider my-1"></div>
+
+        <div class="space-y-2">
+          {% for subtask in subtasks %}
+            <div class="flex flex-col gap-2 rounded-box border border-base-300 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <div class="{% if subtask.done %}line-through text-base-content/50{% endif %}">{{ subtask.title }}</div>
+              <div class="flex flex-wrap gap-2">
+                <form action="{% url 'tasks:subtask_toggle' list_pk=task.task_list.pk pk=task.pk subtask_pk=subtask.pk %}" method="post">
+                  {% csrf_token %}
+                  <button class="btn btn-sm {% if subtask.done %}btn-outline{% else %}btn-success{% endif %}" type="submit">
+                    {% if subtask.done %}Desmarcar{% else %}Concluir{% endif %}
+                  </button>
+                </form>
+                <form action="{% url 'tasks:subtask_delete' list_pk=task.task_list.pk pk=task.pk subtask_pk=subtask.pk %}" method="post">
+                  {% csrf_token %}
+                  <button class="btn btn-error btn-outline btn-sm" type="submit">Excluir</button>
+                </form>
+              </div>
+            </div>
+          {% empty %}
+            <div class="alert">Sem subtarefas</div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </div>
 {% endblock %}

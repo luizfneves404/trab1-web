@@ -3,46 +3,67 @@
 {% block title %}Minhas listas{% endblock %}
 
 {% block content %}
-  <h1>Minhas listas</h1>
-  {% if user.is_authenticated %}
-    <p><a href="{% url 'tasks:list_create' %}" style="display:inline-block; padding:8px 12px; background:#0b6; color:#fff; text-decoration:none; border-radius:4px;">Adicionar lista</a></p>
-  {% endif %}
-  <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start;">
+<div class="space-y-6">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold">Minhas listas</h1>
+      <p class="text-base-content/70">Organize suas tarefas por contexto.</p>
+    </div>
+    {% if user.is_authenticated %}
+    <a class="btn btn-primary" href="{% url 'tasks:list_create' %}">Adicionar lista</a>
+    {% endif %}
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
     {% for lst in task_lists %}
-      <div style="border:1px solid #ccc; padding:12px; width:260px; box-shadow:2px 2px 4px rgba(0,0,0,0.05);">
-        <h2><a href="{% url 'tasks:list_detail' lst.pk %}">{{ lst.name }}</a></h2>
+    <article class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <div class="flex items-start justify-between gap-3">
+          <h2 class="card-title">
+            <a class="link-hover" href="{% url 'tasks:list_detail' lst.pk %}">{{ lst.name }}</a>
+          </h2>
+          <span class="badge badge-neutral">{{ lst.task_count }}</span>
+        </div>
         {% if lst.description %}
-          <p>{{ lst.description }}</p>
+        <p class="text-base-content/70">{{ lst.description }}</p>
         {% endif %}
-        <div>
+
+        <div class="card-actions mt-2">
+          <a class="btn btn-primary btn-sm" href="{% url 'tasks:task_create' list_pk=lst.pk %}">Nova tarefa</a>
+          <a class="btn btn-ghost btn-sm" href="{% url 'tasks:list_update' lst.pk %}">Editar</a>
+          <a class="btn btn-error btn-outline btn-sm" href="{% url 'tasks:list_delete' lst.pk %}">Apagar</a>
+        </div>
+
+        <div class="divider my-1"></div>
+
+        <div class="space-y-3">
           {% for task in lst.preview_tasks %}
-            <p style="margin:0 0 8px;">
-              <strong><a href="{% url 'tasks:task_detail' list_pk=lst.pk pk=task.pk %}">{{ task.title }}</a></strong>
-              <br>
+          <div>
+            <a class="font-semibold link-hover" href="{% url 'tasks:task_detail' list_pk=lst.pk pk=task.pk %}">
+              {{ task.title }}</a>
+            <p class="text-sm text-base-content/70">
               Prazo: {% if task.due_date %}{{ task.due_date|date:"d/m/Y" }}{% else %}sem prazo{% endif %}
             </p>
-            {% if task.status != 'done' %}
-              <form action="{% url 'tasks:task_mark_done' list_pk=lst.pk pk=task.pk %}" method="post" style="margin:0 0 10px;">
-                {% csrf_token %}
-                <button type="submit">Marcar como concluída</button>
-              </form>
+            {% if task.status != "done" %}
+            <form class="mt-2" action="{% url 'tasks:task_mark_done' list_pk=lst.pk pk=task.pk %}" method="post">
+              {% csrf_token %}
+              <button class="btn btn-success btn-xs" type="submit">Marcar como concluída</button>
+            </form>
             {% else %}
-              <p style="margin:0 0 10px;"><strong>Concluída</strong></p>
+            <span class="badge badge-success mt-2">Concluída</span>
             {% endif %}
+          </div>
           {% empty %}
-            <p>0 tarefas</p>
+          <p class="text-base-content/70">0 tarefas</p>
           {% endfor %}
         </div>
-        <p>
-          <a href="{% url 'tasks:task_create' list_pk=lst.pk %}">Nova tarefa</a>
-          ·
-          <a href="{% url 'tasks:list_update' lst.pk %}">Editar</a>
-          ·
-          <a href="{% url 'tasks:list_delete' lst.pk %}">Apagar</a>
-        </p>
       </div>
+    </article>
     {% empty %}
-      <p>Você não possui listas ainda. <a href="{% url 'tasks:list_create' %}">Crie uma</a>.</p>
+    <div class="alert md:col-span-2 lg:col-span-3">
+      Você não possui listas ainda. <a class="link" href="{% url 'tasks:list_create' %}">Crie uma</a>.
+    </div>
     {% endfor %}
   </div>
+</div>
 {% endblock %}
